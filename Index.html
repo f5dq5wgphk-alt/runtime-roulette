@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Movie Runtime Roulette</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #eee;
+      text-align: center;
+      padding: 40px;
+    }
+
+    .roulette {
+      font-size: 2rem;
+      margin: 40px 0;
+      height: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: filter 0.2s ease;
+    }
+
+    /* Blur class applied during spinning */
+    .blurred {
+      filter: blur(6px);
+    }
+
+    input {
+      padding: 10px;
+      font-size: 1.2rem;
+      width: 200px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 1.2rem;
+      margin: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Movie Runtime Roulette</h1>
+
+  <p>Enter a runtime (1–1000 minutes):</p>
+  <input id="runtimeInput" type="number" min="1" max="1000">
+
+  <div>
+    <button id="spinBtn">Spin</button>
+    <button id="stopBtn" disabled>Stop</button>
+  </div>
+
+  <div class="roulette" id="rouletteDisplay">—</div>
+
+  <script>
+    // SAMPLE MOVIE DATA — can be expanded later
+    const movies = [
+      { title: "Aliens", runtime: 137 },
+      { title: "Short Circuit", runtime: 98 },
+      { title: "The Thing", runtime: 109 },
+      { title: "The Godfather", runtime: 175 },
+      { title: "Inseminoid", runtime: 93 },
+      { title: "The Fly", runtime: 96 },
+      { title: "The Texas Chain Saw Massacre", runtime: 83 }
+    ];
+
+    let matches = [];
+    let interval = null;
+
+    const runtimeInput = document.getElementById("runtimeInput");
+    const spinBtn = document.getElementById("spinBtn");
+    const stopBtn = document.getElementById("stopBtn");
+    const display = document.getElementById("rouletteDisplay");
+
+    // Generates random gibberish text for the blur effect
+    function randomBlurText() {
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+      let s = "";
+      for (let i = 0; i < 15; i++) {
+        s += chars[Math.floor(Math.random() * chars.length)];
+      }
+      return s;
+    }
+
+    spinBtn.onclick = () => {
+      const runtime = parseInt(runtimeInput.value);
+
+      if (!runtime) {
+        display.textContent = "Enter a valid runtime.";
+        return;
+      }
+
+      matches = movies.filter(m => m.runtime === runtime);
+
+      if (matches.length === 0) {
+        display.textContent = "No movies found with that runtime.";
+        return;
+      }
+
+      // Start spinning
+      spinBtn.disabled = true;
+      stopBtn.disabled = false;
+
+      // Add blur
+      display.classList.add("blurred");
+
+      interval = setInterval(() => {
+        display.textContent = randomBlurText();
+      }, 60);
+    };
+
+    stopBtn.onclick = () => {
+      clearInterval(interval);
+
+      // Choose real movie
+      const chosen = matches[Math.floor(Math.random() * matches.length)];
+
+      // Remove blur after tiny delay for a clean transition
+      setTimeout(() => {
+        display.classList.remove("blurred");
+        display.textContent = chosen.title;
+      }, 120);
+
+      spinBtn.disabled = false;
+      stopBtn.disabled = true;
+    };
+  </script>
+
+</body>
+</html>
